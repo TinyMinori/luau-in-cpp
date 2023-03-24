@@ -1,1 +1,0 @@
-g++ -g3 main.cpp -L/usr/lib/Luau -l:libLuau.VM.a -l:libLuau.Compiler.a -l:libLuau.Ast.a

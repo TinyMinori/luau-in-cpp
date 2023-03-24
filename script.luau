@@ -11,4 +11,4 @@ end
 local result : string
 result = ispositive(1)
 
-print(result, " hello world !")
+print(result, " hello world from Luau !")

@@ -5,12 +5,13 @@
             "label": "build",
             "command": "g++",
             "args": [
+                "-g3",
+                "main.cpp",
                 "-fdiagnostics-color=always",
                 "-L/usr/lib/Luau",
                 "-l:libLuau.VM.a",
                 "-l:libLuau.Compiler.a",
                 "-l:libLuau.Ast.a",
-                "main.cpp",
                 "-o",
                 "a.out"
             ],

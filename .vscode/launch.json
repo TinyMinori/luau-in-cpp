@@ -8,6 +8,7 @@
         "request": "launch",
         "type": "cppdbg",
         "stopAtEntry": false,
+        "preLaunchTask": "build",
         "program": "${workspaceRoot}/a.out",
         "cwd": "${workspaceRoot}",
         "MIMode": "gdb",
