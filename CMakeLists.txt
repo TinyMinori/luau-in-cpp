@@ -4,6 +4,7 @@ project(luau_in_cpp)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_FLAGS "-g3 -ggdb")
 
 link_directories("/usr/lib/Luau")
 
