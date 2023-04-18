@@ -8,7 +8,7 @@
         "request": "launch",
         "type": "cppdbg",
         "stopAtEntry": false,
-        "program": "${workspaceRoot}/build/luau_in_cpp",
+        "program": "${workspaceRoot}/build/demo/demo",
         "cwd": "${workspaceRoot}",
         "MIMode": "gdb",
         "miDebuggerPath": "/usr/bin/gdb",
