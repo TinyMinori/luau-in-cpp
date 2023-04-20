@@ -9,9 +9,19 @@
  */
 
 #include "LuauScript.h"
+#include <iostream>
 
-int main() {
-    LuauScript  script("script.luau");
+void    help_usage(fs::path programName) {
+    std::cout << "Usage :" << std::endl;
+    std::cout << "./" << programName.filename().u8string() << " [luau_script_filepath]" << std::endl;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        help_usage(argv[0]);  
+        return 1;
+    }
+    LuauScript  script(argv[1]);
 
     return script.run();
 }

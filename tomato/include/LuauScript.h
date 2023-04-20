@@ -1,7 +1,7 @@
 /*
  * File: /include/LuauScript.h
  * 
- * Created the 10 April 2023, 06:17 pm by TinyMinori
+ * Created the 10 April 2023, 06:19 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori
@@ -12,10 +12,13 @@
 #define LUAU_SCRIPT_H_
 
 #include "Luau.h"
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 class LuauScript {
   public:
-    LuauScript(const char *scriptPath);
+    LuauScript(const fs::path scriptPath);
     ~LuauScript();
     int     run();
 
