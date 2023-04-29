@@ -14,16 +14,18 @@
 #include "Luau.h"
 #include <filesystem>
 
-namespace fs = std::filesystem;
+namespace tomato {
+    namespace fs = std::filesystem;
+    
+    class LuauScript {
+    public:
+        LuauScript(const fs::path scriptPath);
+        ~LuauScript();
+        int     run();
 
-class LuauScript {
-  public:
-    LuauScript(const fs::path scriptPath);
-    ~LuauScript();
-    int     run();
-
-  private:
-    lua_State   *p_L;
-};
+    private:
+        lua_State   *p_L;
+    };
+}
 
 #endif  // LUAU_SCRIPT_H_

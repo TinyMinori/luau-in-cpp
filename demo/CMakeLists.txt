@@ -9,5 +9,3 @@ target_sources(demo PRIVATE
 )
 
 target_link_libraries(demo PRIVATE tomato)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/script.luau script.luau COPYONLY)

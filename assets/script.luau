@@ -1,5 +1,3 @@
---! strict
-
 print("Hello World from Luau !");
 
 function ispositive(x : number) : string

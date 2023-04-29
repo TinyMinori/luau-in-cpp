@@ -10,7 +10,7 @@
         "stopAtEntry": false,
         "program": "${workspaceRoot}/build/demo/demo",
         "args": [
-            "${workspaceRoot}/build/demo/script.luau"
+            "${workspaceRoot}/assets/script.luau"
         ],
         "cwd": "${workspaceRoot}",
         "MIMode": "gdb",

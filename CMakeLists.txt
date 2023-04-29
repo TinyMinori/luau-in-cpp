@@ -6,3 +6,5 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 add_subdirectory(tomato)
 add_subdirectory(demo)
+
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR}/demo)

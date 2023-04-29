@@ -11,7 +11,7 @@
 #include "LuauScript.h"
 #include <iostream>
 
-void    help_usage(fs::path programName) {
+void    help_usage(tomato::fs::path programName) {
     std::cout << "Usage :" << std::endl;
     std::cout << "./" << programName.filename().u8string() << " [luau_script_filepath]" << std::endl;
 }
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         help_usage(argv[0]);  
         return 1;
     }
-    LuauScript  script(argv[1]);
+    tomato::LuauScript  script { argv[1] };
 
     return script.run();
 }

@@ -15,17 +15,21 @@
 #include <stdexcept>
 #include <memory>
 
-class LuauError: public std::exception {
-  public:
-    LuauError(lua_State *L);
-    LuauError(const LuauError &other);
-    LuauError &operator=(const LuauError & other);
-    ~LuauError();
-    virtual const char *what() const noexcept;
-  
-  private:
-    lua_State   *p_L;
-    std::shared_ptr<lua_State>    p_luau_resource;
-};
+namespace tomato {
+
+    class LuauError: public std::exception {
+    public:
+        LuauError(lua_State *L);
+        LuauError(const LuauError &other);
+        LuauError &operator=(const LuauError & other);
+        ~LuauError();
+        virtual const char *what() const noexcept;
+    
+    private:
+        lua_State   *p_L;
+        std::shared_ptr<lua_State>    p_luau_resource;
+    };
+
+}
 
 #endif  //LUAU_ERROR_H_
