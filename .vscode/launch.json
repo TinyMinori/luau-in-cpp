@@ -3,17 +3,20 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": [{
-        "name": "Demo",
-        "request": "launch",
-        "type": "cppdbg",
-        "stopAtEntry": false,
-        "program": "${workspaceRoot}/build/demo/demo",
-        "args": [
-            "${workspaceRoot}/assets/script.luau"
-        ],
-        "cwd": "${workspaceRoot}",
-        "MIMode": "gdb",
-        "miDebuggerPath": "/usr/bin/gdb",
-    }]
+    "configurations": [
+        {
+            "name": "Demo",
+            "request": "launch",
+            "type": "cppdbg",
+            "stopAtEntry": false,
+            "preLaunchTask": "Build and run",
+            "program": "${workspaceRoot}/build/demo/demo",
+            "args": [
+                "${workspaceRoot}/assets/script.luau"
+            ],
+            "cwd": "${workspaceRoot}",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+        }
+    ]
 }

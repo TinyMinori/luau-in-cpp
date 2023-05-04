@@ -8,10 +8,7 @@ add_library(tomato SHARED)
 
 target_sources(tomato PRIVATE
     ./include/LuauScript.h
-    ./include/LuauError.h
-    ./include/Luau.h
 
-    ./src/LuauError.cpp
     ./src/LuauScript.cpp
 )
 
