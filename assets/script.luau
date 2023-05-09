@@ -16,8 +16,19 @@ function iseven (x: number): boolean
     return (x % 2 == 0)
 end
 
+function zozo ()
+    local a = 3;
+    local b = 4;
+
+    local sum: number = a + b
+
+    print(string.format("Here is the sum of %d and %d: %d", a, b, sum))
+
+    local avg: number = (a + b) / 2.0;
+    print(string.format("Here is the average of %d and %d: %f", a, b, avg))
+end
+
 local i = 49;
-local result : string
 result = ispositive(i);
 
 print(string.format(

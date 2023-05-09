@@ -1,7 +1,7 @@
 /*
  * File: /tomato/demo/main.cpp
  * 
- * Created the 22 March 2023, 10:02 pm by TinyMinori
+ * Created the 04 May 2023, 11:31 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -35,5 +35,11 @@ int main(int argc, char *argv[]) {
     std::cout << "[C] string of returnFunc: " << std::any_cast<char *>(result.front()) << std::endl << std::endl;
 
     result = script.runFunction("hello", {}, 0);
-    std::cout << "[C] is hello function return empty : " << result.empty() << std::endl;
+    std::cout << "[C] is hello function return empty : " << result.empty() << std::endl << std::endl;
+
+    result = script.runFunction("zozo", {}, 0);
+    std::cout << std::endl;
+    std::cout << "does var `i` exist: " << script.doesExist("i") << std::endl;
+    std::cout << "does function `iseven` exist: " << script.doesExist("iseven") << std::endl;
+    std::cout << "does var `result` exist: " << script.doesExist("result") << std::endl;
 }

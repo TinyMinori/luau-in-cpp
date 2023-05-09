@@ -17,6 +17,7 @@ namespace tomato {
         LuauScript();
         ~LuauScript();
         void    load(const fs::path scriptPath);
+        bool    doesExist(const std::string &globalVarFunc);
         std::list<std::any> runFunction(const std::string &func, std::list<std::any> params, std::size_t resNbr);
         int     call();
         int     run(const fs::path scriptPath);

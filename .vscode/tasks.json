@@ -3,7 +3,7 @@
         {
             "type": "shell",
             "label": "Build and run",
-            "command": "cmake --build ${workspaceRoot}/build",
+            "command": "cmake -S . -B ${workspaceRoot}/build; cmake --build ${workspaceRoot}/build",
             "problemMatcher": [
                 "$gcc"
             ],

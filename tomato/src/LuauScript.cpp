@@ -111,20 +111,34 @@ namespace tomato {
         load(scriptPath);
         return call();
     }
+    
+    bool    LuauScript::doesExist(const std::string &globalVarFunc) {
+        lua_getglobal(p_L, globalVarFunc.c_str());
+
+        bool doesExist = (lua_type(p_L, -1) != LUA_TNIL);
+
+        lua_pop(p_L, 1);
+        return doesExist;
+    }
 
     std::list<std::any> LuauScript::runFunction(const std::string &func, std::list<std::any> params, std::size_t resNbr) {
         lua_getglobal(p_L, func.c_str());
         
+        if (lua_type(p_L, -1) == LUA_TNIL) {
+            std::cerr << "function '" << func.c_str() << "' does not exist." << std::endl;
+            return std::list<std::any>();
+        }
+
         std::size_t  paramsNumber = 0;
         for (auto arg: params) {
             auto argTypeName = std::string(arg.type().name());
 
             if (argTypeName == typeid(int).name())
                 lua_pushinteger(p_L, std::any_cast<int>(arg));
-            else if (argTypeName == typeid(int).name())
+            else if (argTypeName == typeid(double).name())
                 lua_pushnumber(p_L, std::any_cast<double>(arg));
-            else if (argTypeName == typeid(int).name())
-                lua_pushboolean(p_L, std::any_cast<int>(arg));
+            else if (argTypeName == typeid(bool).name())
+                lua_pushboolean(p_L, std::any_cast<bool>(arg) ? 1 : 0);
             else if (argTypeName == typeid(std::string).name())
                 lua_pushstring(p_L, std::any_cast<const char *>(arg));
             else if (argTypeName == typeid(char *).name())
