@@ -7,9 +7,9 @@ set(CMAKE_CXX_FLAGS "-g3 -ggdb")
 add_library(tomato SHARED)
 
 target_sources(tomato PRIVATE
-    ./include/LuauScript.h
+    ./include/LuauContext.h
 
-    ./src/LuauScript.cpp
+    ./src/LuauContext.cpp
 )
 
 find_library(Luau.VM NAMES Luau.VM PATHS "/usr/lib/Luau")

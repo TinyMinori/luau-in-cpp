@@ -1,4 +1,4 @@
-#include "LuauScript.h"
+#include "LuauContext.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -33,7 +33,7 @@ void dumpstack(lua_State *L) {
 
 namespace tomato {
 
-    LuauScript::LuauScript() {
+    LuauContext::LuauContext() {
         // Luau state creation
         p_L = luaL_newstate();
 
@@ -45,11 +45,11 @@ namespace tomato {
         luaL_sandboxthread(p_L);
     }
 
-    LuauScript::~LuauScript() {
+    LuauContext::~LuauContext() {
         lua_close(p_L);
     }
 
-    void    LuauScript::load(const fs::path scriptPath) {
+    void    LuauContext::load(const fs::path scriptPath) {
         // File checks
         if (!fs::is_regular_file(scriptPath))
             throw std::runtime_error("The script named '" + scriptPath.u8string() +  "' is not a correct script location");
@@ -80,7 +80,7 @@ namespace tomato {
             throw std::runtime_error("Memory error");   
     }
 
-    int     LuauScript::call() {
+    int     LuauContext::call() {
         // Call
         int result = lua_pcall(p_L, 0, 0, 0);
 
@@ -107,12 +107,12 @@ namespace tomato {
         return result;
     }
 
-    int     LuauScript::run(const fs::path scriptPath) {
+    int     LuauContext::run(const fs::path scriptPath) {
         load(scriptPath);
         return call();
     }
     
-    bool    LuauScript::doesExist(const std::string &globalVarFunc) {
+    bool    LuauContext::doesExist(const std::string &globalVarFunc) {
         lua_getglobal(p_L, globalVarFunc.c_str());
 
         bool doesExist = (lua_type(p_L, -1) != LUA_TNIL);
@@ -121,7 +121,7 @@ namespace tomato {
         return doesExist;
     }
 
-    std::list<std::any> LuauScript::runFunction(const std::string &func, std::list<std::any> params, std::size_t resNbr) {
+    std::list<std::any> LuauContext::runFunction(const std::string &func, std::list<std::any> params, std::size_t resNbr) {
         lua_getglobal(p_L, func.c_str());
         
         if (lua_type(p_L, -1) == LUA_TNIL) {

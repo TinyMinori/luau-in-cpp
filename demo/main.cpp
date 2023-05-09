@@ -1,14 +1,14 @@
 /*
  * File: /tomato/demo/main.cpp
  * 
- * Created the 04 May 2023, 11:31 pm by TinyMinori
+ * Created the 09 May 2023, 06:48 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
  * Copyright 2023 TinyMinori
  */
 
-#include "LuauScript.h"
+#include "LuauContext.h"
 #include <iostream>
 
 void    help_usage(tomato::fs::path programName) {
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         help_usage(argv[0]);  
         return EXIT_FAILURE;
     }
-    tomato::LuauScript  script {};
+    tomato::LuauContext  script {};
 
     std::cout << std::boolalpha;
     script.run(argv[1]);

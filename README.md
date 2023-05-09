@@ -1,3 +1,3 @@
-# Luau in C++
+# Tomato
 
-This project is a poc on how to implement the flexibility of luau in a c++ project
+The tomato project implements a luau wrapping in a c++
