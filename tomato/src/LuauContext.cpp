@@ -4,33 +4,6 @@
 #include <stdexcept>
 #include <fstream>
 
-void dumpstack(lua_State *L) {
-    printf("Stack Dump\n");
-    int top = lua_gettop(L);
-
-    for (int i = 1; i <= top; i++) {
-        printf("%d\t%-10s\t", i, luaL_typename(L, i));
-
-        switch (lua_type(L, i)) {
-            case LUA_TNUMBER:
-                printf("%g\n", lua_tonumber(L, i));
-                break;
-            case LUA_TSTRING:
-                printf("%s\n", lua_tostring(L, i));
-                break;
-            case LUA_TBOOLEAN:
-                printf("%s\n", (lua_toboolean(L, i) ? "true" : "false"));
-                break;
-            case LUA_TNIL:
-                printf("%s\n", "nil");
-                break;
-            default:
-                printf("%p\n", lua_topointer(L, i));
-                break;
-        }
-    }
-}
-
 namespace tomato {
 
     LuauContext::LuauContext() {
@@ -45,6 +18,13 @@ namespace tomato {
         luaL_sandboxthread(p_L);
     }
 
+    LuauContext::LuauContext(lua_State *threadState) {
+        p_L = threadState;
+
+        if (p_L == nullptr)
+            throw std::bad_alloc();
+    }
+
     LuauContext::~LuauContext() {
         lua_close(p_L);
     }
@@ -52,12 +32,12 @@ namespace tomato {
     void    LuauContext::load(const fs::path scriptPath) {
         // File checks
         if (!fs::is_regular_file(scriptPath))
-            throw std::runtime_error("The script named '" + scriptPath.u8string() +  "' is not a correct script location");
+            throw std::runtime_error(std::string("The script named") + scriptPath.c_str() + "is not a correct script location.");
 
         std::ifstream   scriptFile(scriptPath);
         std::string     source;
         if (!scriptFile.is_open())
-            throw std::runtime_error("Couldn't open file '" + scriptPath.u8string() + "'.");
+            throw std::runtime_error(std::string("Couldn't open file") + scriptPath.c_str() + ".");
         
         std::string     line;
         while (scriptFile) {
@@ -90,7 +70,7 @@ namespace tomato {
         std::string errorMsg; 
         if (lua_type(p_L, -1) == LUA_TSTRING) {
             size_t  strSize = 0;
-            dumpstack(p_L);
+            dumpstack();
             const char *msg = lua_tolstring(p_L, -1, &strSize);
             errorMsg = std::string(msg, strSize);
         }
@@ -148,19 +128,19 @@ namespace tomato {
             
             paramsNumber++;
         }
-        //dumpstack(p_L);
+        //dumpstack();
 
         int callResult = lua_pcall(p_L, paramsNumber, resNbr, 0);
         
         if (callResult != LUA_OK) {
-            dumpstack(p_L);
+            dumpstack();
 
             throw std::runtime_error(lua_tostring(p_L, -1));
         }
 
         std::list<std::any> resultList = {};
 
-        //dumpstack(p_L);
+        //dumpstack();
         for (std::size_t i = 0; i < resNbr; i++) {
             std::any result;
 
@@ -204,4 +184,35 @@ namespace tomato {
         return resultList;
     }
     
+    void    LuauContext::dumpstack() {
+        std::clog << std::boolalpha;
+        std::clog << "-- Start of stack dump --" << std::endl;
+        int top = lua_gettop(p_L);
+
+        if (top == 0)
+            std::clog << "-- Empty stack --" << std::endl;
+
+        for (int i = 0; i < top; i++) {
+            std::clog << i << "\t" << std::setfill(' ') << std::setw(10) << luaL_typename(p_L, i) << "\t";
+
+            switch (lua_type(p_L, i)) {
+                case LUA_TNUMBER:
+                    std::clog << lua_tonumber(p_L, i) << std::endl;
+                    break;
+                case LUA_TSTRING:
+                    std::clog << lua_tostring(p_L, i) << std::endl;
+                    break;
+                case LUA_TBOOLEAN:
+                    std::clog << (lua_toboolean(p_L, i) > 0) << std::endl;
+                    break;
+                case LUA_TNIL:
+                    std::clog << "nil" << std::endl;
+                    break;
+                default:
+                    std::clog << lua_topointer(p_L, i) << std::endl;
+                    break;
+            }
+        }
+        std::clog << "-- End of stack dump --" << std::endl;
+    }
 }
