@@ -1,3 +1,13 @@
+/*
+ * File: /tomato/tomato/src/LuauContext.cpp
+ * 
+ * Created the 04 May 2023, 11:31 pm by TinyMinori
+ * Description :
+ * 
+ * Project repository: https://github.com/TinyMinori/tomato
+ * Copyright 2024 TinyMinori
+ */
+
 #include "LuauContext.h"
 
 #include <iostream>
@@ -48,7 +58,7 @@ namespace tomato {
         scriptFile.close();
 
         // Compile and load
-        size_t bytecodeSize = 0;
+        size_t  bytecodeSize = 0;
         char    *bytecode = luau_compile(source.c_str(), source.length(), NULL, &bytecodeSize);
 
         int result = luau_load(p_L, scriptPath.c_str(), bytecode, bytecodeSize, 0);
@@ -57,7 +67,9 @@ namespace tomato {
         if (result == LUA_ERRSYNTAX)
             throw std::runtime_error("Syntax error");
         if (result == LUA_ERRMEM)
-            throw std::runtime_error("Memory error");   
+            throw std::runtime_error("Memory error");
+        if (result != LUA_OK)
+            throw std::runtime_error("error #" + std::to_string(result));
     }
 
     int     LuauContext::call() {
@@ -88,6 +100,7 @@ namespace tomato {
     }
 
     int     LuauContext::run(const fs::path scriptPath) {
+        luaL_sandboxthread(p_L);
         load(scriptPath);
         return call();
     }
@@ -101,10 +114,11 @@ namespace tomato {
         return doesExist;
     }
 
-    std::list<std::any> LuauContext::runFunction(const std::string &func, std::list<std::any> params, std::size_t resNbr) {
+    std::list<std::any> LuauContext::runFunction(const std::string &func, std::list<std::any> params) {
+        int stackSize = lua_gettop(p_L);
         lua_getglobal(p_L, func.c_str());
         
-        if (lua_type(p_L, -1) == LUA_TNIL) {
+        if (!lua_isfunction(p_L, -1)) {
             std::cerr << "function '" << func.c_str() << "' does not exist." << std::endl;
             return std::list<std::any>();
         }
@@ -114,24 +128,23 @@ namespace tomato {
             auto argTypeName = std::string(arg.type().name());
 
             if (argTypeName == typeid(int).name())
-                lua_pushinteger(p_L, std::any_cast<int>(arg));
+                push(std::any_cast<int>(arg));
             else if (argTypeName == typeid(double).name())
-                lua_pushnumber(p_L, std::any_cast<double>(arg));
+                push(std::any_cast<double>(arg));
             else if (argTypeName == typeid(bool).name())
-                lua_pushboolean(p_L, std::any_cast<bool>(arg) ? 1 : 0);
+                push(std::any_cast<bool>(arg) ? 1 : 0);
             else if (argTypeName == typeid(std::string).name())
-                lua_pushstring(p_L, std::any_cast<const char *>(arg));
+                push(std::any_cast<const char *>(arg));
             else if (argTypeName == typeid(char *).name())
-                lua_pushstring(p_L, std::any_cast<const char *>(arg));
+                push(std::any_cast<const char *>(arg));
             else
-                lua_pushnil(p_L);
+                push();
             
             paramsNumber++;
         }
-        //dumpstack();
 
-        int callResult = lua_pcall(p_L, paramsNumber, resNbr, 0);
-        
+        int callResult = lua_pcall(p_L, paramsNumber, LUA_MULTRET, 0);
+
         if (callResult != LUA_OK) {
             dumpstack();
 
@@ -140,7 +153,7 @@ namespace tomato {
 
         std::list<std::any> resultList = {};
 
-        //dumpstack();
+        int resNbr = lua_gettop(p_L) - stackSize;
         for (std::size_t i = 0; i < resNbr; i++) {
             std::any result;
 
@@ -148,7 +161,7 @@ namespace tomato {
             if (resultType == LUA_TNONE)
                 continue;
             
-            switch (lua_type(p_L, -1)) {
+            switch (resultType) {
                 case LUA_TNIL:
                     result = NULL;
                     break;
@@ -177,8 +190,8 @@ namespace tomato {
                     std::cerr << "Missed a result" << std::endl;
             }
 
-            resultList.push_back(result);                
-            lua_pop(p_L, 1);
+            resultList.push_back(result);
+            lua_pop(p_L, -1);
         }
 
         return resultList;
@@ -186,13 +199,14 @@ namespace tomato {
     
     void    LuauContext::dumpstack() {
         std::clog << std::boolalpha;
-        std::clog << "-- Start of stack dump --" << std::endl;
+        std::clog << "*************************" << std::endl;
+        std::clog << "* Start of stack dump   *" << std::endl;
         int top = lua_gettop(p_L);
 
         if (top == 0)
-            std::clog << "-- Empty stack --" << std::endl;
-
-        for (int i = 0; i < top; i++) {
+            std::clog << "* Empty stack           *" << std::endl;
+        
+        for (int i = top; i > 0; i--) {
             std::clog << i << "\t" << std::setfill(' ') << std::setw(10) << luaL_typename(p_L, i) << "\t";
 
             switch (lua_type(p_L, i)) {
@@ -213,6 +227,7 @@ namespace tomato {
                     break;
             }
         }
-        std::clog << "-- End of stack dump --" << std::endl;
+        std::clog << "* End of stack dump     *" << std::endl;
+        std::clog << "*************************" << std::endl;
     }
 }

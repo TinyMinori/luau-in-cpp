@@ -5,11 +5,33 @@
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
- * Copyright 2023 TinyMinori
+ * Copyright 2024 TinyMinori
  */
 
 #include "LuauContext.h"
 #include <iostream>
+#include <cmath>
+#include <algorithm>
+
+bool is_number(const std::string &s) {
+    std::string inner = s;
+    
+    if (inner.empty())
+        return false;
+    
+    if (inner.at(0) == '-')
+        inner.erase(0, 1);
+
+    if (inner.empty())
+        return false;
+
+    return std::find_if(
+            inner.begin(),
+            inner.end(),
+            [](unsigned char c) { return !std::isdigit(c); }
+        ) == inner.end();
+}
+
 
 void    help_usage(tomato::fs::path programName) {
     std::cout << "Usage :" << std::endl;
@@ -25,23 +47,42 @@ int main(int argc, char *argv[]) {
 
     std::cout << std::boolalpha;
     script.run(argv[1]);
-    auto result = script.runFunction("iseven", {2}, 1);
-    std::cout << "[C] Is 2 even: " << script.pop<bool>(-1) << std::endl << std::endl;
 
-    result = script.runFunction("iseven", {3}, 1);
-    script.dumpstack();
-    std::cout << "[C] Is 3 even: " << script.pop<bool>(-1) << std::endl << std::endl;
+    auto result = script.runFunction("isHere", {});
+    std::cout << "[C] Is 2 even: " << std::any_cast<bool>(result.front()) << std::endl << std::endl;
 
-    result = script.runFunction("returnFunc", {}, 1);
-    std::cout << "[C] string of returnFunc: " << script.pop<const char *>(-1) << std::endl << std::endl;
+    std::string input;
+    int         iptNum;
+    while (true) {
+        std::cout << "Input a number: ";
+        std::cin >> input;
 
-    script.dumpstack();
-    result = script.runFunction("hello", {}, 0);
+        if (input == "exit" || input == "q" || input == "quit") {
+            std::cout << std::endl;
+            break;
+        }
+
+        if (!is_number(input))
+            continue;
+
+        iptNum = stoi(input);
+        result = script.runFunction("isPositive", {iptNum});
+        std::cout << "[C] Is " << iptNum << " positive: " << std::any_cast<bool>(result.front()) << std::endl << std::endl;
+
+    }
+
+    result = script.runFunction("isEven", {3});
+    std::cout << "[C] Is 3 even: " << std::any_cast<bool>(result.front())  << std::endl << std::endl;
+
+    result = script.runFunction("returnFunc", {});
+    std::cout << "[C] string of returnFunc: " << std::any_cast<char *>(result.front()) << std::endl << std::endl;
+
+    result = script.runFunction("printHello", {});
     std::cout << "[C] is hello function return empty : " << result.empty() << std::endl << std::endl;
 
-    result = script.runFunction("zozo", {}, 0);
+    result = script.runFunction("zozo", {});
     std::cout << std::endl;
     std::cout << "does var `i` exist: " << script.doesExist("i") << std::endl;
-    std::cout << "does function `iseven` exist: " << script.doesExist("iseven") << std::endl;
+    std::cout << "does function `iseven` exist: " << script.doesExist("isEven") << std::endl;
     std::cout << "does var `result` exist: " << script.doesExist("result") << std::endl;
 }

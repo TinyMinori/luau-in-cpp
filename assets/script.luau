@@ -1,6 +1,8 @@
+--!strict
+
 print("hello starting")
 
-function hello (): nil
+function printHello (): nil
     print("[Luau] Hello World from Luau !");
 end
 
@@ -8,12 +10,16 @@ function returnFunc (): string
     return "hello world from Luau in a return";
 end
 
-function ispositive (x: number): boolean
-    return x > 0;
+function isPositive (x: number): boolean
+    return x >= 0;
 end
 
-function iseven (x: number): boolean
-    return (x % 2 == 0)
+function isEven (x: number): boolean
+    return (x % 2) == 0;
+end
+
+function isHere (): boolean
+    return true;
 end
 
 function zozo ()
@@ -29,11 +35,10 @@ function zozo ()
 end
 
 local i = 49;
-result = ispositive(i);
+result = isPositive(i);
 
 print(string.format(
     "[Luau] Is %d positive ? %s", i, tostring(result)))
-
-result = iseven(i);
+result = isEven(i);
 print(string.format(
-    "[Luau] Is %d even ? %s\n", i, tostring(result)))
+    "[Luau] Is %d even ? %s", i, tostring(result)))
