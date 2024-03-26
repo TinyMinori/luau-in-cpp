@@ -166,25 +166,25 @@ namespace tomato {
                     result = NULL;
                     break;
                 case LUA_TBOOLEAN:
-                    result = lua_toboolean(p_L, -1) != 0;
+                    result = get<bool>(-1);
                     break;
                 case LUA_TLIGHTUSERDATA:
-                    result = lua_tolightuserdata(p_L, -1);
-                    break;
-                case LUA_TNUMBER:
-                    result = lua_tonumber(p_L, -1);
-                    break;
-                case LUA_TSTRING:
-                    result = const_cast<char *>(lua_tostring(p_L, -1));
-                    break;
-                case LUA_TFUNCTION:
-                    result = lua_tocfunction(p_L, -1);
+                    result = get<LightUserData *>(-1);
                     break;
                 case LUA_TUSERDATA:
-                    result = lua_touserdata(p_L, -1);
+                    result = get<UserData *>(-1);
+                    break;
+                case LUA_TNUMBER:
+                    result = get<double>(-1);
+                    break;
+                case LUA_TSTRING:
+                    result = get<char *>(-1);
+                    break;
+                case LUA_TFUNCTION:
+                    result = get<lua_CFunction>(-1);
                     break;
                 case LUA_TTHREAD:
-                    result = lua_tothread(p_L, -1);
+                    result = get<lua_State*>(-1);
                     break;
                 default:
                     std::cerr << "Missed a result" << std::endl;
@@ -211,19 +211,19 @@ namespace tomato {
 
             switch (lua_type(p_L, i)) {
                 case LUA_TNUMBER:
-                    std::clog << lua_tonumber(p_L, i) << std::endl;
+                    std::clog << get<double>(i) << std::endl;
                     break;
                 case LUA_TSTRING:
-                    std::clog << lua_tostring(p_L, i) << std::endl;
+                    std::clog << get<char*>(i) << std::endl;
                     break;
                 case LUA_TBOOLEAN:
-                    std::clog << (lua_toboolean(p_L, i) > 0) << std::endl;
+                    std::clog << get<bool>(i) << std::endl;
                     break;
                 case LUA_TNIL:
                     std::clog << "nil" << std::endl;
                     break;
                 default:
-                    std::clog << lua_topointer(p_L, i) << std::endl;
+                    std::clog << get<void*>(i) << std::endl;
                     break;
             }
         }

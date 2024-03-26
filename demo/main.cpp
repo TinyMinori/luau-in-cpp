@@ -76,11 +76,12 @@ int main(int argc, char *argv[]) {
 
     result = script.runFunction("returnFunc", {});
     std::cout << "[C] string of returnFunc: " << std::any_cast<char *>(result.front()) << std::endl << std::endl;
-
+    
     result = script.runFunction("printHello", {});
     std::cout << "[C] is hello function return empty : " << result.empty() << std::endl << std::endl;
 
     result = script.runFunction("zozo", {});
+
     std::cout << std::endl;
     std::cout << "does var `i` exist: " << script.doesExist("i") << std::endl;
     std::cout << "does function `iseven` exist: " << script.doesExist("isEven") << std::endl;
