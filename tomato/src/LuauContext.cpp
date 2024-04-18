@@ -196,6 +196,10 @@ namespace tomato {
 
         return resultList;
     }
+
+    void  LuauContext::push() {
+        lua_pushnil(p_L);
+    }
     
     void    LuauContext::dumpstack() {
         std::clog << std::boolalpha;
