@@ -12,7 +12,7 @@
             "preLaunchTask": "Build and run",
             "program": "${workspaceRoot}/build/demo/demo",
             "args": [
-                "${workspaceRoot}/assets/script.luau"
+                "${workspaceRoot}/demo/resources/script.luau"
             ],
             "cwd": "${workspaceRoot}",
             "MIMode": "gdb",
