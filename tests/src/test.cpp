@@ -1,28 +1,24 @@
 /*
- * File: /tomato/test/test.cpp
+ * File: /tomato/tests/src/test.cpp
  * 
- * Created the 02 April 2024, 11:33 pm by TinyMinori
+ * Created the 06 April 2024, 05:05 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
  * Copyright 2024 TinyMinori
  */
 
-#define CATCH_CONFIG_MAIN
-
 #include <catch2/catch_test_macros.hpp>
-
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
 #include <stdexcept>
-#include "LuauContext.h"
+#include "test.h"
 
-TEST_CASE("Testing Tomato", "[tomato]")
+TEST_CASE("Testing Tomato")
 {
-    tomato::LuauContext  script {};
-
-    script.run("assets/script.luau");
+    tomato::LuauContext script;
+    script.run("resources/existing-variables.luau");
 
     REQUIRE(script.doesExist("result") == true);
 
@@ -34,16 +30,15 @@ TEST_CASE("Testing Tomato", "[tomato]")
     }
 }
 
-TEST_CASE("Run scripts in tomato", "[tomato]")
+TEST_CASE("Run scripts in tomato")
 {
-    tomato::LuauContext  script {};
-
+    tomato::LuauContext script;
     SECTION("Check script opening") {
         CHECK_THROWS_MATCHES(
-            script.run("assets/non-existing.luau"),
+            script.run("resources/non-existing.luau"),
             std::runtime_error,
-            Catch::Matchers::ExceptionMessageMatcher("The script named assets/non-existing.luau is not a correct script location."));
+            Catch::Matchers::ExceptionMessageMatcher("The script named resources/non-existing.luau is not a correct script location."));
         
-        CHECK_NOTHROW(script.run("assets/script.luau"));
+        CHECK_NOTHROW(script.run("resources/existing-script.luau"));
     }
 }
