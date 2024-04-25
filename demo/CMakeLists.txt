@@ -7,7 +7,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3 -ggdb")
 add_executable(demo)
 
 target_sources(demo PRIVATE
-    main.cpp
+    src/main.cpp
 )
 
 target_link_libraries(demo PRIVATE tomato)
+
+file(COPY resources DESTINATION ${CMAKE_BINARY_DIR}/demo)

@@ -42,12 +42,12 @@ namespace tomato {
     void    LuauContext::load(const fs::path scriptPath) {
         // File checks
         if (!fs::is_regular_file(scriptPath))
-            throw std::runtime_error(std::string("The script named") + scriptPath.c_str() + "is not a correct script location.");
+            throw std::runtime_error(std::string("The script named ") + scriptPath.c_str() + " is not a correct script location.");
 
         std::ifstream   scriptFile(scriptPath);
         std::string     source;
         if (!scriptFile.is_open())
-            throw std::runtime_error(std::string("Couldn't open file") + scriptPath.c_str() + ".");
+            throw std::runtime_error(std::string("Couldn't open file ") + scriptPath.c_str() + ".");
         
         std::string     line;
         while (scriptFile) {
@@ -195,6 +195,10 @@ namespace tomato {
         }
 
         return resultList;
+    }
+
+    void  LuauContext::push() {
+        lua_pushnil(p_L);
     }
     
     void    LuauContext::dumpstack() {

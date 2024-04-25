@@ -24,4 +24,4 @@ target_link_libraries(
     ${Luau.Ast}
 )
 
-target_include_directories(tomato PUBLIC ${tomato_SOURCE_DIR}/include)
+target_include_directories(tomato PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
