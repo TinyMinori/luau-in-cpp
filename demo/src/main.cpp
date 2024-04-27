@@ -1,5 +1,5 @@
 /*
- * File: /tomato/demo/main.cpp
+ * File: /tomato/demo/src/main.cpp
  * 
  * Created the 04 May 2023, 11:31 pm by TinyMinori
  * Description :
@@ -43,7 +43,8 @@ int main(int argc, char *argv[]) {
         help_usage(argv[0]);  
         return EXIT_FAILURE;
     }
-    tomato::LuauContext  script {};
+    tomato::LuauContext  script = tomato::LuauContext();
+    script = tomato::LuauContext();
 
     std::cout << std::boolalpha;
     script.run(argv[1]);

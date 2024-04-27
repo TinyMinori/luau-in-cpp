@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tomato/src/LuauContext.cpp
  * 
- * Created the 04 May 2023, 11:31 pm by TinyMinori
+ * Created the 25 April 2024, 10:28 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -33,6 +33,36 @@ namespace tomato {
 
         if (p_L == nullptr)
             throw std::bad_alloc();
+    }
+
+    LuauContext::LuauContext(const LuauContext& other): p_L(other.p_L) {}
+
+    LuauContext::LuauContext(LuauContext&& other) : p_L(other.p_L) {
+        other.p_L = nullptr;
+    }
+
+    LuauContext& LuauContext::operator=(const LuauContext& other) {
+        p_L = other.p_L;
+        return *this;
+    } 
+
+    LuauContext& LuauContext::operator=(LuauContext&& other) {        
+        if (this != &other)
+            return *this;
+        
+        if (other.p_L != nullptr)
+            p_L = other.p_L;
+        else {
+            p_L = luaL_newstate();
+
+            if (p_L == nullptr)
+                throw std::bad_alloc();
+            luaL_openlibs(p_L);
+            luaL_sandbox(p_L);
+        }
+        other.p_L = nullptr;
+
+        return *this;
     }
 
     LuauContext::~LuauContext() {

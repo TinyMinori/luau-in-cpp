@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tomato/include/LuauContext.h
  * 
- * Created the 04 May 2023, 11:31 pm by TinyMinori
+ * Created the 25 April 2024, 10:28 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -43,12 +43,16 @@ namespace tomato {
         std::list<std::any> runFunction(const std::string &func, std::list<std::any> params);
         int call();
         int run(const fs::path scriptPath);
-
+        
         void push();
         template<typename T> void push(T val);
         template<typename T> T get(StackIndex idx);
         template<typename T> T pop(StackIndex idx);
 
+        LuauContext(const LuauContext& other);
+        LuauContext(LuauContext&& other);
+        LuauContext& operator=(LuauContext&& other);
+        LuauContext& operator=(const LuauContext& other);
     private:
         LuauContext(lua_State *threadState);
 
