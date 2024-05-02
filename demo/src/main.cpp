@@ -1,7 +1,7 @@
 /*
  * File: /tomato/demo/src/main.cpp
  * 
- * Created the 04 May 2023, 11:31 pm by TinyMinori
+ * Created the 25 April 2024, 10:28 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -43,13 +43,17 @@ int main(int argc, char *argv[]) {
         help_usage(argv[0]);  
         return EXIT_FAILURE;
     }
-    tomato::LuauContext  script = tomato::LuauContext();
-    script = tomato::LuauContext();
+    tomato::LuauContext script{};
+    tomato::LuauContext moveConstr(std::move(script));
+    tomato::LuauContext moveOpp{};
+    moveOpp = std::move(moveConstr);
 
     std::cout << std::boolalpha;
-    script.run(argv[1]);
+    if (script.run(argv[1]) == STATE_NOT_INIALIZED)
+        std::cout << "found the script is not initialized" << std::endl;
+    moveOpp.run(argv[1]);
 
-    auto result = script.runFunction("isHere", {});
+    auto result = moveOpp.runFunction("isHere", {});
     std::cout << "[C] Is 2 even: " << std::any_cast<bool>(result.front()) << std::endl << std::endl;
 
     std::string input;
@@ -67,24 +71,24 @@ int main(int argc, char *argv[]) {
             continue;
 
         iptNum = stoi(input);
-        result = script.runFunction("isPositive", {iptNum});
+        result = moveOpp.runFunction("isPositive", {iptNum});
         std::cout << "[C] Is " << iptNum << " positive: " << std::any_cast<bool>(result.front()) << std::endl << std::endl;
 
     }
 
-    result = script.runFunction("isEven", {3});
+    result = moveOpp.runFunction("isEven", {3});
     std::cout << "[C] Is 3 even: " << std::any_cast<bool>(result.front())  << std::endl << std::endl;
 
-    result = script.runFunction("returnFunc", {});
+    result = moveOpp.runFunction("returnFunc", {});
     std::cout << "[C] string of returnFunc: " << std::any_cast<char *>(result.front()) << std::endl << std::endl;
     
-    result = script.runFunction("printHello", {});
+    result = moveOpp.runFunction("printHello", {});
     std::cout << "[C] is hello function return empty : " << result.empty() << std::endl << std::endl;
 
-    result = script.runFunction("zozo", {});
+    result = moveOpp.runFunction("zozo", {});
 
     std::cout << std::endl;
-    std::cout << "does var `i` exist: " << script.doesExist("i") << std::endl;
-    std::cout << "does function `iseven` exist: " << script.doesExist("isEven") << std::endl;
-    std::cout << "does var `result` exist: " << script.doesExist("result") << std::endl;
+    std::cout << "does var `i` exist: " << moveOpp.doesExist("i") << std::endl;
+    std::cout << "does function `iseven` exist: " << moveOpp.doesExist("isEven") << std::endl;
+    std::cout << "does var `result` exist: " << moveOpp.doesExist("result") << std::endl;
 }
