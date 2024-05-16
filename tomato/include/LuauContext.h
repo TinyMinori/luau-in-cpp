@@ -12,14 +12,14 @@
 #define LUAU_SCRIPT_H_
 
 #include <filesystem>
-#include "Luau/lua.h"
-#include "Luau/lualib.h"
-#include "Luau/luacode.h"
 #include <string>
 #include <any>
 #include <list>
 #include <concepts>
 #include <memory>
+#include "Luau/lua.h"
+#include "Luau/lualib.h"
+#include "Luau/luacode.h"
 
 namespace tomato {
     #define STATE_NOT_INIALIZED 255
@@ -28,13 +28,9 @@ namespace tomato {
     
     typedef int64_t StackIndex;
     
-    struct UserData {
-        virtual ~UserData() = default;
-    };
-
-    struct LightUserData {
-        virtual ~LightUserData() = default;
-    };
+    struct UserData {};
+    
+    struct LightUserData {};
 
     class LuauContext {
     public:
