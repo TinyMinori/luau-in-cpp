@@ -26,7 +26,7 @@ namespace tomato {
 
         luaL_openlibs(p_L.get());
         luaL_sandbox(p_L.get());
-        lua_mainthread(p_L.get());
+        luaL_sandboxthread(p_L.get());
     }
 
     LuauContext::LuauContext(lua_State *threadState): p_L(threadState, deleteStack) {
@@ -36,7 +36,7 @@ namespace tomato {
 
     LuauContext::LuauContext(LuauContext&& other) : p_L(std::move(other.p_L)) { }
 
-    LuauContext& LuauContext::operator=(LuauContext&& other) {        
+    LuauContext& LuauContext::operator=(LuauContext&& other) {
         if (this == &other)
             return *this;
         
@@ -45,8 +45,6 @@ namespace tomato {
 
         return *this;
     }
-
-    LuauContext::~LuauContext() { }
 
     void    LuauContext::load(const fs::path scriptPath) {
         // File checks
@@ -117,7 +115,7 @@ namespace tomato {
         return call();
     }
     
-    bool    LuauContext::doesExist(const std::string &globalVarFunc) {
+    bool    LuauContext::doesExist(const std::string &globalVarFunc) noexcept {
         lua_getglobal(p_L.get(), globalVarFunc.c_str());
 
         bool doesExist = (lua_type(p_L.get(), -1) != LUA_TNIL);
@@ -214,7 +212,7 @@ namespace tomato {
         lua_pushnil(p_L.get());
     }
     
-    void    LuauContext::dumpstack() {
+    void    LuauContext::dumpstack() noexcept {
         std::clog << std::boolalpha;
         std::clog << "*************************" << std::endl;
         std::clog << "* Start of stack dump   *" << std::endl;

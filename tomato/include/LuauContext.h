@@ -35,10 +35,9 @@ namespace tomato {
     class LuauContext {
     public:
         LuauContext();
-        ~LuauContext();
 
         void load(const fs::path scriptPath);
-        bool doesExist(const std::string &globalVarFunc);
+        bool doesExist(const std::string &globalVarFunc) noexcept;
         std::list<std::any> runFunction(const std::string &func, std::list<std::any> params);
         int call();
         int run(const fs::path scriptPath);
@@ -56,7 +55,7 @@ namespace tomato {
         LuauContext(lua_State *threadState);
 
         std::unique_ptr<lua_State, void(*)(lua_State*)>  p_L;
-        void dumpstack();   
+        void dumpstack() noexcept;   
     };
 
     template<>
