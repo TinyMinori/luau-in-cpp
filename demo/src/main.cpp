@@ -1,7 +1,7 @@
 /*
- * File: /tomato/demo/main.cpp
+ * File: /tomato/demo/src/main.cpp
  * 
- * Created the 04 May 2023, 11:31 pm by TinyMinori
+ * Created the 25 April 2024, 10:28 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
         help_usage(argv[0]);  
         return EXIT_FAILURE;
     }
-    tomato::LuauContext  script {};
+    tomato::LuauContext script{};
 
     std::cout << std::boolalpha;
     script.run(argv[1]);
