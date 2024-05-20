@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tests/src/moveOperatorTests.cpp
  * 
- * Created the 19 May 2024, 09:24 pm by TinyMinori
+ * Created the 20 May 2024, 01:36 am by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -9,7 +9,6 @@
  */
 
 #include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers.hpp>
 #include "LuauContext.h"
 
 TEST_CASE("Check move constructor and operator")
