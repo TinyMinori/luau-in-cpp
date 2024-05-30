@@ -1,7 +1,7 @@
 /*
  * File: /tomato/demo/src/main.cpp
  * 
- * Created the 25 April 2024, 10:28 pm by TinyMinori
+ * Created the 20 May 2024, 01:36 am by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -12,6 +12,7 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <map>
 
 bool is_number(const std::string &s) {
     std::string inner = s;
@@ -47,6 +48,42 @@ int main(int argc, char *argv[]) {
 
     std::cout << std::boolalpha;
     script.run(argv[1]);
+
+    auto isPositive = script.getVariable("isPositiveVar");
+    std::cout << "[C] Is positive variable: " << std::any_cast<bool>(isPositive) << std::endl << std::endl;
+
+    bool arrTestExists = script.doesExist("arrayTest");
+    std::cout << "[C] arrayTest does exist : " << arrTestExists << std::endl;
+
+    auto arrTest = script.getVariable("arrayTest");
+    std::map<tomato::KeyType, std::any> map = std::any_cast<std::map<tomato::KeyType, std::any>>(arrTest);
+    std::cout << "[C] arrayTest variable: {";
+    for (auto it = map.begin(); it != map.end(); ++it) {
+        auto i = std::distance(map.begin(), it);
+
+        try {
+            std::cout << std::get<int>(it->first);
+        } catch (const std::bad_variant_access& ex) {
+            try {
+                std::cout << std::get<bool>(it->first);
+            } catch (const std::bad_variant_access& ex) {
+                std::cout << "\"" << std::get<char *>(it->first) << "\"";                
+            }
+        }
+        std::cout << " to ";
+        if (it->second.type().hash_code() == typeid(int).hash_code())
+            std::cout << std::any_cast<int>(it->second);
+        else if (it->second.type().hash_code() == typeid(bool).hash_code())
+            std::cout << std::any_cast<bool>(it->second);
+        else if (it->second.type().hash_code() == typeid(char*).hash_code())
+            std::cout << "\"" << std::any_cast<char *>(it->second) << "\"";
+        else
+            std::cout << "null";
+
+        if ((i + 1) < map.size())
+            std::cout << ", ";
+    }
+    std::cout << "}" << std::endl << std::endl;
 
     auto result = script.runFunction("isHere", {});
     std::cout << "[C] Is 2 even: " << std::any_cast<bool>(result.front()) << std::endl << std::endl;

@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tomato/src/LuauContext.cpp
  * 
- * Created the 25 April 2024, 10:28 pm by TinyMinori
+ * Created the 20 May 2024, 01:36 am by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -13,10 +13,27 @@
 #include <iostream>
 #include <stdexcept>
 #include <fstream>
+#include <map>
 
-auto deleteStack(lua_State *state) {
+void deleteStack(lua_State *state) {
     lua_close(state);
 }
+
+template<>
+struct std::hash<std::any>
+{
+    std::size_t operator()(const std::any& s) const noexcept
+    {
+        std::size_t hash;
+        if (s.type().name() == "int")
+            hash = std::hash<int>{}(std::any_cast<int>(s));
+        if (s.type().name() == "string")
+            hash = std::hash<std::string>{}(std::any_cast<std::string>(s));
+        if (s.type().name() == "bool")
+            hash = std::hash<bool>{}(std::any_cast<bool>(s));
+        return hash;
+    }
+};
 
 namespace tomato {
 
@@ -47,7 +64,7 @@ namespace tomato {
     }
 
     void    LuauContext::load(const fs::path scriptPath) {
-        // File checks
+        // File checks and read
         if (!fs::is_regular_file(scriptPath))
             throw std::runtime_error(std::string("The script named ") + scriptPath.c_str() + " is not a correct script location.");
 
@@ -80,7 +97,6 @@ namespace tomato {
     }
 
     int     LuauContext::call() {
-        // Call
         int result = lua_pcall(p_L.get(), 0, 0, 0);
 
         if (result == LUA_OK)
@@ -202,10 +218,86 @@ namespace tomato {
             }
 
             resultList.push_back(result);
-            lua_pop(p_L.get(), -1);
+            lua_pop(p_L.get(), 1);
         }
 
         return resultList;
+    }
+
+    std::any    LuauContext::getVariable(const std::string &varName) {
+        lua_getglobal(p_L.get(), varName.c_str());
+
+        std::any variable = getVarInStack(-1);
+
+        lua_pop(p_L.get(), 1);
+        return variable;
+    }
+
+
+    std::any    LuauContext::getVarInStack(StackIndex idx) {
+        int type = lua_type(p_L.get(), idx);
+        if (type == LUA_TNONE)
+            return nullptr;
+
+        std::any result;
+        switch (type) {
+            case LUA_TNIL:
+                result = nullptr;
+                break;
+            case LUA_TBOOLEAN:
+                result = get<bool>(idx);
+                break;
+            case LUA_TLIGHTUSERDATA:
+                result = get<LightUserData *>(idx);
+                break;
+            case LUA_TUSERDATA:
+                result = get<UserData *>(idx);
+                break;
+            case LUA_TNUMBER: {
+                double first = get<double>(idx);
+                int second = get<int>(idx);
+
+                if (first == second)
+                    result = second;
+                else
+                    result = first;
+                break;
+            }
+            case LUA_TSTRING:
+                result = get<char *>(idx);
+                break;
+            case LUA_TFUNCTION:
+                result = get<lua_CFunction>(idx);
+                break;
+            case LUA_TTHREAD:
+                result = get<lua_State*>(idx);
+                break;
+            case LUA_TTABLE: {
+                int stackSizeStart = lua_gettop(p_L.get());
+                int stackPosKey = stackSizeStart + 1;
+                int stackPosValue = stackSizeStart + 2;
+                push();
+                std::map<KeyType, std::any> map;
+                while (lua_next(p_L.get(), stackSizeStart) != 0) {
+                    std::any key = getVarInStack(stackPosKey);
+                    std::any value = getVarInStack(stackPosValue);
+
+                    int keyType = lua_type(p_L.get(), stackPosKey);                    
+                    if (keyType == LUA_TNUMBER)
+                        map.insert(std::pair{ std::any_cast<int>(key), value });
+                    else if (keyType == LUA_TSTRING)
+                        map.insert(std::pair { std::any_cast<char *>(key), value });
+                    else if (keyType == LUA_TBOOLEAN)
+                        map.insert(std::pair { std::any_cast<bool>(key), value });
+                    lua_pop(p_L.get(), 1);
+                }
+                result = map;
+                break;
+            }
+            default:
+                std::cerr << "Missed a result" << std::endl;
+        }
+        return result;
     }
 
     void  LuauContext::push() {

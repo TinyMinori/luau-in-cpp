@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tomato/include/LuauContext.h
  * 
- * Created the 25 April 2024, 10:28 pm by TinyMinori
+ * Created the 20 May 2024, 01:36 am by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -17,6 +17,8 @@
 #include <list>
 #include <concepts>
 #include <memory>
+#include <variant>
+#include <map>
 #include "Luau/lua.h"
 #include "Luau/lualib.h"
 #include "Luau/luacode.h"
@@ -25,12 +27,14 @@ namespace tomato {
     #define STATE_NOT_INIALIZED 255
 
     namespace fs = std::filesystem;
-    
-    typedef int64_t StackIndex;
-    
+
     struct UserData {};
     
     struct LightUserData {};
+
+    typedef int64_t StackIndex;
+
+    typedef std::variant<bool, int, char*> KeyType;
 
     class LuauContext {
     public:
@@ -39,6 +43,8 @@ namespace tomato {
         void load(const fs::path scriptPath);
         bool doesExist(const std::string &globalVarFunc) noexcept;
         std::list<std::any> runFunction(const std::string &func, std::list<std::any> params);
+        std::any getVariable(const std::string &varName);
+        std::any getVarInStack(StackIndex idx);
         int call();
         int run(const fs::path scriptPath);
         
@@ -56,6 +62,11 @@ namespace tomato {
 
         std::unique_ptr<lua_State, void(*)(lua_State*)>  p_L;
         void dumpstack() noexcept;   
+    };
+
+    template<typename T>
+    inline T LuauContext::get(StackIndex idx) {
+        static_assert(sizeof(T) == 0, "only specialized methods are usable");
     };
 
     template<>
@@ -104,11 +115,6 @@ namespace tomato {
     };
 
     template<typename T>
-    inline T LuauContext::get(StackIndex idx) {
-        static_assert(sizeof(T) == 0, "only specialized methods are usable");
-    };
-
-    template<typename T>
     inline T LuauContext::pop(StackIndex idx) {
         T result = get<T>(idx);
         lua_pop(p_L.get(), 1);
@@ -134,12 +140,12 @@ namespace tomato {
     template<>
     inline void LuauContext::push<const char *>(const char * val) {
         lua_pushstring(p_L.get(), val);
-    }
+    };
 
     template<>
     inline void LuauContext::push<LightUserData *>(LightUserData * val) {
         lua_pushlightuserdata(p_L.get(), val);
-    }
+    };
 }
 
 #endif  // LUAU_SCRIPT_H_
