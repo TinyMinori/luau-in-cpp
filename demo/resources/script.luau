@@ -43,7 +43,14 @@ result = isEven(i)
 print(string.format(
     "[Luau] Is %d even ? %s", i, tostring(result)))
 
-arrayTest = { ["key"] = 9, [false] = 8, "seven", 6, 5}
-for idx, k in pairs(arrayTest) do
-    print("[Luau]", idx, k)
+arrayTest = { ["retryNbr"] = 9, { [false] = "no", [true] = "yes" }, "seven", 6, 5}
+function displayMap(map)
+    for idx, k in pairs(map) do
+        print("[Luau]", idx, k)
+        if typeof(k) == "table" then
+            displayMap(k)
+        end
+    end
 end
+
+displayMap(arrayTest)

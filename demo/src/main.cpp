@@ -33,6 +33,38 @@ bool is_number(const std::string &s) {
         ) == inner.end();
 }
 
+void displayMap(std::map<tomato::KeyType, std::any> map) {
+    std::cout << "{";
+    for (auto it = map.begin(); it != map.end(); ++it) {
+        auto i = std::distance(map.begin(), it);
+
+        try {
+            std::cout << std::get<int>(it->first);
+        } catch (const std::bad_variant_access& ex) {
+            try {
+                std::cout << std::get<bool>(it->first);
+            } catch (const std::bad_variant_access& ex) {
+                std::cout << "\"" << std::get<char *>(it->first) << "\"";                
+            }
+        }
+        std::cout << ": ";
+        if (it->second.type().hash_code() == typeid(int).hash_code())
+            std::cout << std::any_cast<int>(it->second);
+        else if (it->second.type().hash_code() == typeid(bool).hash_code())
+            std::cout << std::any_cast<bool>(it->second);
+        else if (it->second.type().hash_code() == typeid(char*).hash_code())
+            std::cout << "\"" << std::any_cast<char *>(it->second) << "\"";
+        else if (it->second.type().hash_code() == typeid(std::map<tomato::KeyType, std::any>).hash_code())
+            displayMap(std::any_cast<std::map<tomato::KeyType, std::any>>(it->second));
+        else
+            std::cout << "null";
+
+        if ((i + 1) < map.size())
+            std::cout << ", ";
+    }
+    std::cout << "}";
+}
+
 
 void    help_usage(tomato::fs::path programName) {
     std::cout << "Usage :" << std::endl;
@@ -57,33 +89,9 @@ int main(int argc, char *argv[]) {
 
     auto arrTest = script.getVariable("arrayTest");
     std::map<tomato::KeyType, std::any> map = std::any_cast<std::map<tomato::KeyType, std::any>>(arrTest);
-    std::cout << "[C] arrayTest variable: {";
-    for (auto it = map.begin(); it != map.end(); ++it) {
-        auto i = std::distance(map.begin(), it);
-
-        try {
-            std::cout << std::get<int>(it->first);
-        } catch (const std::bad_variant_access& ex) {
-            try {
-                std::cout << std::get<bool>(it->first);
-            } catch (const std::bad_variant_access& ex) {
-                std::cout << "\"" << std::get<char *>(it->first) << "\"";                
-            }
-        }
-        std::cout << " to ";
-        if (it->second.type().hash_code() == typeid(int).hash_code())
-            std::cout << std::any_cast<int>(it->second);
-        else if (it->second.type().hash_code() == typeid(bool).hash_code())
-            std::cout << std::any_cast<bool>(it->second);
-        else if (it->second.type().hash_code() == typeid(char*).hash_code())
-            std::cout << "\"" << std::any_cast<char *>(it->second) << "\"";
-        else
-            std::cout << "null";
-
-        if ((i + 1) < map.size())
-            std::cout << ", ";
-    }
-    std::cout << "}" << std::endl << std::endl;
+    std::cout << "[C] arrayTest variable: ";
+    displayMap(map);
+    std::cout << std::endl << std::endl;
 
     auto result = script.runFunction("isHere", {});
     std::cout << "[C] Is 2 even: " << std::any_cast<bool>(result.front()) << std::endl << std::endl;
