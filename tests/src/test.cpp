@@ -19,8 +19,9 @@ TEST_CASE("Check existing variables")
     tomato::LuauContext script{};
     script.run("./resources/existing-variables.luau");
 
-    REQUIRE(script.doesExist("result") == true);
-    REQUIRE(script.doesExist("i") == false);
+    REQUIRE(script.doesExist("globalVar") == true);
+    REQUIRE(script.doesExist("localScopeVar") == false);
+    REQUIRE(script.doesExist("doesNotExist") == false);
 }
 
 TEST_CASE("Check script opening")

@@ -1,5 +1,5 @@
 --!strict
 
-result = 0
+globalVar = 0
 
-local i = "not exported"
+local localScopeVar = "not exported"
