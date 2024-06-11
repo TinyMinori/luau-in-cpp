@@ -43,6 +43,8 @@ namespace tomato {
         void load(const fs::path scriptPath);
         bool doesExist(const std::string &globalVarFunc) noexcept;
         std::list<std::any> runFunction(const std::string &func, std::list<std::any> params);
+        int getVariableType(const std::string &varName);
+        int getVarTypeInStack(StackIndex idx);
         std::any getVariable(const std::string &varName);
         std::any getVarInStack(StackIndex idx);
         int call();

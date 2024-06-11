@@ -224,6 +224,19 @@ namespace tomato {
         return resultList;
     }
 
+
+    int LuauContext::getVariableType(const std::string &varName) {
+        lua_getglobal(p_L.get(), varName.c_str());
+        int type = getVarTypeInStack(-1);
+
+        lua_pop(p_L.get(), 1);
+        return type;
+    }
+
+    int LuauContext::getVarTypeInStack(StackIndex idx) {
+        return lua_type(p_L.get(), idx);
+    }
+
     std::any    LuauContext::getVariable(const std::string &varName) {
         lua_getglobal(p_L.get(), varName.c_str());
 
@@ -232,7 +245,6 @@ namespace tomato {
         lua_pop(p_L.get(), 1);
         return variable;
     }
-
 
     std::any    LuauContext::getVarInStack(StackIndex idx) {
         int type = lua_type(p_L.get(), idx);
