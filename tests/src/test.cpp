@@ -12,12 +12,12 @@
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <stdexcept>
-#include "LuauContext.h"
+#include "Context.h"
+#include "Reader.h"
 
 TEST_CASE("Check existing variables")
 {
-    tomato::LuauContext script{};
-    script.run("./resources/existing-variables.luau");
+    tomato::LuauContext script = tomato::LuauReader::getContextFromFile("./resources/existing-variables.luau");
 
     REQUIRE(script.doesExist("globalVar") == true);
     REQUIRE(script.doesExist("localScopeVar") == false);
@@ -26,11 +26,10 @@ TEST_CASE("Check existing variables")
 
 TEST_CASE("Check script opening")
 {
-    tomato::LuauContext script{};
     CHECK_THROWS_MATCHES(
-        script.run("./resources/non-existing.luau"),
+        tomato::LuauReader::getContextFromFile("./resources/non-existing.luau"),
         std::runtime_error,
         Catch::Matchers::ExceptionMessageMatcher("The script named ./resources/non-existing.luau is not a correct script location."));
     
-    CHECK_NOTHROW(script.run("./resources/existing-script.luau"));
+    CHECK_NOTHROW(tomato::LuauReader::getContextFromFile("./resources/existing-script.luau"));
 }

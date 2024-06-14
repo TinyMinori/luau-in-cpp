@@ -9,14 +9,13 @@
  */
 
 #include <catch2/catch_test_macros.hpp>
-#include "LuauContext.h"
+#include "Context.h"
+#include "Reader.h"
 #include <iostream>
 
 TEST_CASE("Check the retrieve of the primary types variable")
 {
-    tomato::LuauContext script{};
-
-    script.run("./resources/variable-primary.luau");
+    tomato::LuauContext script = tomato::LuauReader::getContextFromFile("./resources/variable-primary.luau");
 
     std::list<std::string> allVariablesNames{ "isRunning", "distance", "pi", "libraryName" };
 

@@ -1,14 +1,14 @@
 /*
  * File: /tomato/demo/src/main.cpp
  * 
- * Created the 20 May 2024, 01:36 am by TinyMinori
+ * Created the 11 June 2024, 10:10 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
  * Copyright 2024 TinyMinori
  */
 
-#include "LuauContext.h"
+#include "Reader.h"
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -66,9 +66,9 @@ void displayMap(std::map<tomato::KeyType, std::any> map) {
 }
 
 
-void    help_usage(tomato::fs::path programName) {
+void    help_usage(const std::string& programName) {
     std::cout << "Usage :" << std::endl;
-    std::cout << "./" << programName.filename().c_str() << " [luau_script_filepath]" << std::endl;
+    std::cout << "./" << programName.c_str() << " [luau_script_filepath]" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -76,10 +76,9 @@ int main(int argc, char *argv[]) {
         help_usage(argv[0]);  
         return EXIT_FAILURE;
     }
-    tomato::LuauContext script{};
+    tomato::LuauContext script = tomato::LuauReader::getContextFromFile(argv[1]);
 
     std::cout << std::boolalpha;
-    script.run(argv[1]);
 
     auto isPositive = script.getVariable("isPositiveVar");
     std::cout << "[C] Is positive variable: " << std::any_cast<bool>(isPositive) << std::endl << std::endl;
