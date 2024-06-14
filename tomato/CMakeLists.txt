@@ -9,9 +9,9 @@ set(LUAU_LIBRARY_DIR "/usr/lib/Luau")
 add_library(tomato SHARED)
 
 target_sources(tomato PRIVATE
-    ./include/LuauContext.h
-
-    ./src/LuauContext.cpp
+    ./src/Exceptions.cpp
+    ./src/Reader.cpp
+    ./src/Context.cpp
 )
 
 find_library(Luau.VM NAMES Luau.VM PATHS ${LUAU_LIBRARY_DIR})

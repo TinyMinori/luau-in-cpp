@@ -1,5 +1,5 @@
 /*
- * File: /tomato/tomato/src/LuauContext.cpp
+ * File: /tomato/tomato/src/Context.cpp
  * 
  * Created the 20 May 2024, 01:36 am by TinyMinori
  * Description :
@@ -8,11 +8,12 @@
  * Copyright 2024 TinyMinori
  */
 
-#include "LuauContext.h"
+#include "Context.h"
 
 #include <iostream>
 #include <stdexcept>
 #include <fstream>
+#include <iomanip>
 #include <map>
 
 void deleteStack(lua_State *state) {
@@ -63,39 +64,6 @@ namespace tomato {
         return *this;
     }
 
-    void    LuauContext::load(const fs::path scriptPath) {
-        // File checks and read
-        if (!fs::is_regular_file(scriptPath))
-            throw std::runtime_error(std::string("The script named ") + scriptPath.c_str() + " is not a correct script location.");
-
-        std::ifstream   scriptFile(scriptPath);
-        std::string     source;
-        if (!scriptFile.is_open())
-            throw std::runtime_error(std::string("Couldn't open file ") + scriptPath.c_str() + ".");
-        
-        std::string     line;
-        while (scriptFile) {
-            line = "";
-            std::getline(scriptFile, line);
-            source += line + '\n';
-        }
-        scriptFile.close();
-
-        // Compile and load
-        size_t  bytecodeSize = 0;
-        char    *bytecode = luau_compile(source.c_str(), source.length(), NULL, &bytecodeSize);
-
-        int result = luau_load(p_L.get(), scriptPath.c_str(), bytecode, bytecodeSize, 0);
-        free(bytecode);
-
-        if (result == LUA_ERRSYNTAX)
-            throw std::runtime_error("Syntax error");
-        if (result == LUA_ERRMEM)
-            throw std::runtime_error("Memory error");
-        if (result != LUA_OK)
-            throw std::runtime_error("error #" + std::to_string(result));
-    }
-
     int     LuauContext::call() {
         int result = lua_pcall(p_L.get(), 0, 0, 0);
 
@@ -120,15 +88,6 @@ namespace tomato {
         if (result == LUA_ERRERR)
             throw std::logic_error(errorMsg);
         return result;
-    }
-
-    int     LuauContext::run(const fs::path scriptPath) {
-        if (p_L.get() == nullptr)
-            return STATE_NOT_INIALIZED;
-        
-        luaL_sandboxthread(p_L.get());
-        load(scriptPath);
-        return call();
     }
     
     bool    LuauContext::doesExist(const std::string &globalVarFunc) noexcept {

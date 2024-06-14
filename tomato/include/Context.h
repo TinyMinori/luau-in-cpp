@@ -1,5 +1,5 @@
 /*
- * File: /tomato/tomato/include/LuauContext.h
+ * File: /tomato/tomato/include/Context.h
  * 
  * Created the 20 May 2024, 01:36 am by TinyMinori
  * Description :
@@ -11,7 +11,6 @@
 #ifndef LUAU_SCRIPT_H_
 #define LUAU_SCRIPT_H_
 
-#include <filesystem>
 #include <string>
 #include <any>
 #include <list>
@@ -24,10 +23,6 @@
 #include "Luau/luacode.h"
 
 namespace tomato {
-    #define STATE_NOT_INIALIZED 255
-
-    namespace fs = std::filesystem;
-
     struct UserData {};
     
     struct LightUserData {};
@@ -38,30 +33,31 @@ namespace tomato {
 
     class LuauContext {
     public:
-        LuauContext();
+        friend class LuauReader;
 
-        void load(const fs::path scriptPath);
+        LuauContext(const LuauContext& other) = delete;
+        LuauContext(LuauContext&& other);
+        
+        LuauContext& operator=(const LuauContext& other) = delete;
+        LuauContext& operator=(LuauContext&& other);
+
         bool doesExist(const std::string &globalVarFunc) noexcept;
         std::list<std::any> runFunction(const std::string &func, std::list<std::any> params);
         int getVariableType(const std::string &varName);
         int getVarTypeInStack(StackIndex idx);
         std::any getVariable(const std::string &varName);
         std::any getVarInStack(StackIndex idx);
-        int call();
-        int run(const fs::path scriptPath);
         
         void push();
         template<typename T> void push(T val);
         template<typename T> T get(StackIndex idx);
         template<typename T> T pop(StackIndex idx);
 
-        LuauContext(const LuauContext& other) = delete;
-        LuauContext(LuauContext&& other);
-        LuauContext& operator=(const LuauContext& other) = delete;
-        LuauContext& operator=(LuauContext&& other);
     private:
+        LuauContext();
         LuauContext(lua_State *threadState);
 
+        int call();
         std::unique_ptr<lua_State, void(*)(lua_State*)>  p_L;
         void dumpstack() noexcept;   
     };
