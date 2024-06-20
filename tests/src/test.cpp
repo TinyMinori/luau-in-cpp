@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include "Context.h"
 #include "Reader.h"
+#include "Exceptions.h"
 
 TEST_CASE("Check existing variables")
 {
@@ -26,10 +27,15 @@ TEST_CASE("Check existing variables")
 
 TEST_CASE("Check script opening")
 {
-    CHECK_THROWS_MATCHES(
-        tomato::LuauReader::getContextFromFile("./resources/non-existing.luau"),
-        std::runtime_error,
-        Catch::Matchers::ExceptionMessageMatcher("The script named ./resources/non-existing.luau is not a correct script location."));
-    
+    try {
+        tomato::LuauReader::getContextFromFile("./resources/non-existing.luau");
+        FAIL("Must failed but succeed");
+    } catch (const tomato::LuauException &e) {
+        if (e.getId() == tomato::LuauExceptions::FileDoesNotExist)
+            SUCCEED("Failed successfully");
+        else
+            FAIL("Failed with the wrong exception");
+    }
+
     CHECK_NOTHROW(tomato::LuauReader::getContextFromFile("./resources/existing-script.luau"));
 }

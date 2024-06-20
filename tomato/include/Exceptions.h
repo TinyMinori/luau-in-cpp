@@ -12,15 +12,27 @@
 #include <string>
 
 namespace tomato {
+
+enum LuauExceptions {
+    FileDoesNotExist,
+    FileNotRegular,
+    FileRightsError,
+
+    CompileSyntaxError,
+    LoadError,
+
+    StateNotInitialized
+};
+
 class LuauException: public std::exception {
 public:
-    LuauException(int id, const std::string& message);
+    LuauException(LuauExceptions id, const std::string& message);
     const char* what() const noexcept;
-    int getId() const noexcept;
+    LuauExceptions getId() const noexcept;
 
 private:
     const std::string &m_message;
-    int m_id;
+    LuauExceptions m_id;
 };
 
 }

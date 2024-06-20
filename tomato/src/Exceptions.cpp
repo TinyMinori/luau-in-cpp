@@ -12,7 +12,7 @@
 
 namespace tomato {
 
-LuauException::LuauException(int id, const std::string& message)
+LuauException::LuauException(LuauExceptions id, const std::string& message)
 : m_id(id), m_message(message)
 {}
 
@@ -20,7 +20,7 @@ const char* LuauException::what() const noexcept {
     return m_message.c_str();
 }
 
-int LuauException::getId() const noexcept {
+LuauExceptions LuauException::getId() const noexcept {
     return m_id;
 }
 

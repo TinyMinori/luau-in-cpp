@@ -9,6 +9,7 @@
  */
 
 #include <fstream>
+#include <cstring>
 #include "Reader.h"
 #include "Exceptions.h"
 #include "Luau/lua.h"
@@ -16,14 +17,17 @@
 
 namespace tomato {
 
-LuauContext LuauReader::getContextFromFile(const fs::path &filepath) {
+LuauContext LuauReader::getContextFromFile(const fs::path &filepath) noexcept(false) {
+    if (!fs::exists(filepath))
+        throw LuauException(LuauExceptions::FileDoesNotExist, std::string("The file ") + filepath.c_str() + " doesn't exist.");
+    
     if (!fs::is_regular_file(filepath))
-        throw std::runtime_error(std::string("The script named ") + filepath.c_str() + " is not a correct script location.");
+        throw LuauException(LuauExceptions::FileNotRegular, std::string("The file ") + filepath.c_str() + " is not a regular file.");
 
     std::ifstream   scriptFile(filepath);
     std::string     source;
     if (!scriptFile.is_open())
-        throw std::runtime_error(std::string("Couldn't open file ") + filepath.c_str() + ".");
+        throw LuauException(LuauExceptions::FileRightsError, std::string("Couldn't open file ") + filepath.c_str() + ".");
     
     std::string     line;
     while (scriptFile) {
@@ -36,26 +40,27 @@ LuauContext LuauReader::getContextFromFile(const fs::path &filepath) {
     return getContextFromText(source, filepath.c_str());
 }
 
-LuauContext LuauReader::getContextFromText(const std::string &luauScript, const std::string &chuckName) {
+LuauContext LuauReader::getContextFromText(const std::string &luauScript, const std::string &chuckName) noexcept(false) {
     auto luauContext = LuauContext();
 
     if (luauContext.p_L.get() == nullptr)
-        throw LuauException(STATE_NOT_INITIALIZED, "state not inizialised");
+        throw LuauException(LuauExceptions::StateNotInitialized, "state not inizialised");
 
     // Compile and load
     size_t  bytecodeSize = 0;
     char    *bytecode = luau_compile(luauScript.c_str(), luauScript.length(), NULL, &bytecodeSize);
 
+    if (bytecode == nullptr || strlen(bytecode) == 0)
+        throw LuauException(LuauExceptions::CompileSyntaxError, "Syntax Error");
+    
     int result = luau_load(luauContext.p_L.get(), chuckName.c_str(), bytecode, bytecodeSize, 0);
     free(bytecode);
 
-    if (result == LUA_ERRSYNTAX)
-        throw std::runtime_error("Syntax error");
-    if (result == LUA_ERRMEM)
-        throw std::runtime_error("Memory error");
     if (result != LUA_OK)
-        throw std::runtime_error("error #" + std::to_string(result));
-    luauContext.call();
+        throw LuauException(LuauExceptions::LoadError, "error #" + std::to_string(result));
+    
+    luauContext.ca<ll();
+
     return luauContext;
 }
 

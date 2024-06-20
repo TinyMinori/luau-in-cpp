@@ -14,15 +14,12 @@
 #include <filesystem>
 #include "Context.h"
 
-#define STATE_NOT_INITIALIZED 255
-
 namespace fs = std::filesystem;
 
 namespace tomato {
     class LuauReader {
     public:
-        static LuauContext getContextFromFile(const fs::path &filepath);
-        static LuauContext getContextFromText(const std::string &luauScript, const std::string &chunkName);
-    
+        static LuauContext getContextFromFile(const fs::path &filepath) noexcept(false);
+        static LuauContext getContextFromText(const std::string &luauScript, const std::string &chunkName) noexcept(false);
     };
 }
