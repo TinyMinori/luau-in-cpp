@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tests/src/test.cpp
  * 
- * Created the 20 May 2024, 01:36 am by TinyMinori
+ * Created the 02 June 2024, 08:33 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -12,13 +12,13 @@
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
 #include <stdexcept>
-#include "Context.h"
-#include "Reader.h"
-#include "Exceptions.h"
+#include "LuauState.h"
+#include "LuauReader.h"
+#include "LuauExceptions.h"
 
 TEST_CASE("Check existing variables")
 {
-    tomato::LuauContext script = tomato::LuauReader::getContextFromFile("./resources/existing-variables.luau");
+    LuauState script = LuauReader::getContextFromFile("./resources/existing-variables.luau");
 
     REQUIRE(script.doesExist("globalVar") == true);
     REQUIRE(script.doesExist("localScopeVar") == false);
@@ -28,14 +28,14 @@ TEST_CASE("Check existing variables")
 TEST_CASE("Check script opening")
 {
     try {
-        tomato::LuauReader::getContextFromFile("./resources/non-existing.luau");
+        LuauReader::getContextFromFile("./resources/non-existing.luau");
         FAIL("Must failed but succeed");
-    } catch (const tomato::LuauException &e) {
-        if (e.getId() == tomato::LuauExceptions::FileDoesNotExist)
+    } catch (const Exception &e) {
+        if (e.getId() == LuauExceptions::FileDoesNotExist)
             SUCCEED("Failed successfully");
         else
             FAIL("Failed with the wrong exception");
     }
 
-    CHECK_NOTHROW(tomato::LuauReader::getContextFromFile("./resources/existing-script.luau"));
+    CHECK_NOTHROW(LuauReader::getContextFromFile("./resources/existing-script.luau"));
 }

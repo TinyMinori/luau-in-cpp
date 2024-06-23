@@ -1,17 +1,17 @@
 /*
- * File: /tomato/tomato/include/Exceptions.h
+ * File: /tomato/tomato/include/LuauExceptions.h
  * 
- * Created the 14 June 2024, 02:41 pm by TinyMinori
+ * Created the 25 June 2024, 12:50 am by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
  * Copyright 2024 TinyMinori
  */
 
+#pragma once
+
 #include <exception>
 #include <string>
-
-namespace tomato {
 
 enum LuauExceptions {
     FileDoesNotExist,
@@ -24,9 +24,9 @@ enum LuauExceptions {
     StateNotInitialized
 };
 
-class LuauException: public std::exception {
+class Exception: public std::exception {
 public:
-    LuauException(LuauExceptions id, const std::string& message);
+    Exception(LuauExceptions id, const std::string& message);
     const char* what() const noexcept;
     LuauExceptions getId() const noexcept;
 
@@ -34,5 +34,3 @@ private:
     const std::string &m_message;
     LuauExceptions m_id;
 };
-
-}

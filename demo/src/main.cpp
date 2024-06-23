@@ -1,14 +1,14 @@
 /*
  * File: /tomato/demo/src/main.cpp
  * 
- * Created the 11 June 2024, 10:10 pm by TinyMinori
+ * Created the 20 May 2024, 01:36 am by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
  * Copyright 2024 TinyMinori
  */
 
-#include "Reader.h"
+#include "LuauReader.h"
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -33,7 +33,7 @@ bool is_number(const std::string &s) {
         ) == inner.end();
 }
 
-void displayMap(std::map<tomato::KeyType, std::any> map) {
+void displayMap(std::map<KeyType, std::any> map) {
     std::cout << "{";
     for (auto it = map.begin(); it != map.end(); ++it) {
         auto i = std::distance(map.begin(), it);
@@ -54,8 +54,8 @@ void displayMap(std::map<tomato::KeyType, std::any> map) {
             std::cout << std::any_cast<bool>(it->second);
         else if (it->second.type().hash_code() == typeid(char*).hash_code())
             std::cout << "\"" << std::any_cast<char *>(it->second) << "\"";
-        else if (it->second.type().hash_code() == typeid(std::map<tomato::KeyType, std::any>).hash_code())
-            displayMap(std::any_cast<std::map<tomato::KeyType, std::any>>(it->second));
+        else if (it->second.type().hash_code() == typeid(std::map<KeyType, std::any>).hash_code())
+            displayMap(std::any_cast<std::map<KeyType, std::any>>(it->second));
         else
             std::cout << "null";
 
@@ -68,7 +68,7 @@ void displayMap(std::map<tomato::KeyType, std::any> map) {
 
 void    help_usage(const std::string& programName) {
     std::cout << "Usage :" << std::endl;
-    std::cout << "./" << programName.c_str() << " [luau_script_filepath]" << std::endl;
+    std::cout << "./" << programName.c_str() << " [_script_filepath]" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
         help_usage(argv[0]);  
         return EXIT_FAILURE;
     }
-    tomato::LuauContext script = tomato::LuauReader::getContextFromFile(argv[1]);
+    LuauState script = LuauReader::getContextFromFile(argv[1]);
 
     std::cout << std::boolalpha;
 
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
     std::cout << "[C] arrayTest does exist : " << arrTestExists << std::endl;
 
     auto arrTest = script.getVariable("arrayTest");
-    std::map<tomato::KeyType, std::any> map = std::any_cast<std::map<tomato::KeyType, std::any>>(arrTest);
+    std::map<KeyType, std::any> map = std::any_cast<std::map<KeyType, std::any>>(arrTest);
     std::cout << "[C] arrayTest variable: ";
     displayMap(map);
     std::cout << std::endl << std::endl;
