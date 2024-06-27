@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tests/src/test.cpp
  * 
- * Created the 02 June 2024, 08:33 pm by TinyMinori
+ * Created the 20 May 2024, 01:36 am by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -20,9 +20,9 @@ TEST_CASE("Check existing variables")
 {
     LuauState script = LuauReader::getContextFromFile("./resources/existing-variables.luau");
 
-    REQUIRE(script.doesExist("globalVar") == true);
-    REQUIRE(script.doesExist("localScopeVar") == false);
-    REQUIRE(script.doesExist("doesNotExist") == false);
+    REQUIRE(script.getGlobals().doesExist("globalVar") == true);
+    REQUIRE(script.getGlobals().doesExist("localScopeVar") == false);
+    REQUIRE(script.getGlobals().doesExist("doesNotExist") == false);
 }
 
 TEST_CASE("Check script opening")

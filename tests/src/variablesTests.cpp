@@ -22,9 +22,9 @@ TEST_CASE("Check the retrieve of the primary types variable")
     try {
         std::for_each(allVariablesNames.begin(), allVariablesNames.end(), [&](const std::string &it) {
             std::cout << it << std::endl;
-            if (!script.doesExist(it))
+            if (!script.getGlobals().doesExist(it))
                 FAIL(it + " does not exist");
-            int varType = script.getVariableType(it);
+            int varType = script.getGlobals().getType(it);
             switch (varType) {
                 case LUA_TBOOLEAN:
                     std::any_cast<bool>(script.getVariable(it));

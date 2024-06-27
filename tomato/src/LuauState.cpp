@@ -9,6 +9,7 @@
  */
 
 #include "LuauState.h"
+#include "LuauGlobals.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -37,7 +38,7 @@ struct std::hash<std::any>
 };
 
 
-LuauState::LuauState(): p_L(luaL_newstate(), deleteStack) {
+LuauState::LuauState(): p_L(luaL_newstate(), deleteStack), m_globals(LuauGlobals(*this)) {
     if (p_L.get() == nullptr)
         throw std::bad_alloc();
 
@@ -46,12 +47,12 @@ LuauState::LuauState(): p_L(luaL_newstate(), deleteStack) {
     luaL_sandboxthread(p_L.get());
 }
 
-LuauState::LuauState(lua_State *threadState): p_L(threadState, deleteStack) {
+LuauState::LuauState(lua_State *threadState): p_L(threadState, deleteStack), m_globals(LuauGlobals(*this)) {
     if (p_L.get() == nullptr)
         throw std::bad_alloc();
 }
 
-LuauState::LuauState(LuauState&& other) : p_L(std::move(other.p_L)) { }
+LuauState::LuauState(LuauState&& other) : p_L(std::move(other.p_L)), m_globals(LuauGlobals(*this)) { }
 
 LuauState& LuauState::operator=(LuauState&& other) {
     if (this == &other)
@@ -59,7 +60,7 @@ LuauState& LuauState::operator=(LuauState&& other) {
     
     if (other.p_L.get() != nullptr)
         p_L = std::move(other.p_L);
-
+    m_globals = LuauGlobals(*this);
     return *this;
 }
 
@@ -87,15 +88,6 @@ int     LuauState::call() {
     if (result == LUA_ERRERR)
         throw std::logic_error(errorMsg);
     return result;
-}
-
-bool    LuauState::doesExist(const std::string &globalVarFunc) noexcept {
-    lua_getglobal(p_L.get(), globalVarFunc.c_str());
-
-    bool doesExist = (lua_type(p_L.get(), -1) != LUA_TNIL);
-
-    lua_pop(p_L.get(), 1);
-    return doesExist;
 }
 
 std::list<std::any> LuauState::runFunction(const std::string &func, std::list<std::any> params) {
@@ -182,17 +174,8 @@ std::list<std::any> LuauState::runFunction(const std::string &func, std::list<st
     return resultList;
 }
 
-
-int LuauState::getVariableType(const std::string &varName) {
-    lua_getglobal(p_L.get(), varName.c_str());
-    int type = getVarTypeInStack(-1);
-
-    lua_pop(p_L.get(), 1);
-    return type;
-}
-
-int LuauState::getVarTypeInStack(StackIndex idx) {
-    return lua_type(p_L.get(), idx);
+LuauGlobals& LuauState::getGlobals() noexcept {
+    return m_globals;
 }
 
 std::any    LuauState::getVariable(const std::string &varName) {

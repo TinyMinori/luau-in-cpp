@@ -11,6 +11,7 @@ add_library(tomato SHARED)
 target_sources(tomato PRIVATE
     ./src/LuauExceptions.cpp
     ./src/LuauReader.cpp
+    ./src/LuauGlobals.cpp
     ./src/LuauState.cpp
 )
 

@@ -1,7 +1,7 @@
 /*
  * File: /tomato/demo/src/main.cpp
  * 
- * Created the 20 May 2024, 01:36 am by TinyMinori
+ * Created the 11 June 2024, 10:10 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -9,6 +9,7 @@
  */
 
 #include "LuauReader.h"
+#include "LuauGlobals.h"
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -83,7 +84,7 @@ int main(int argc, char *argv[]) {
     auto isPositive = script.getVariable("isPositiveVar");
     std::cout << "[C] Is positive variable: " << std::any_cast<bool>(isPositive) << std::endl << std::endl;
 
-    bool arrTestExists = script.doesExist("arrayTest");
+    bool arrTestExists = script.getGlobals().doesExist("arrayTest");
     std::cout << "[C] arrayTest does exist : " << arrTestExists << std::endl;
 
     auto arrTest = script.getVariable("arrayTest");
@@ -127,7 +128,7 @@ int main(int argc, char *argv[]) {
     result = script.runFunction("zozo", {});
 
     std::cout << std::endl;
-    std::cout << "does var `i` exist: " << script.doesExist("i") << std::endl;
-    std::cout << "does function `iseven` exist: " << script.doesExist("isEven") << std::endl;
-    std::cout << "does var `result` exist: " << script.doesExist("result") << std::endl;
+    std::cout << "does var `i` exist: " << script.getGlobals().doesExist("i") << std::endl;
+    std::cout << "does function `iseven` exist: " << script.getGlobals().doesExist("isEven") << std::endl;
+    std::cout << "does var `result` exist: " << script.getGlobals().doesExist("result") << std::endl;
 }

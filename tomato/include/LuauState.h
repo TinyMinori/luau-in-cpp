@@ -17,9 +17,10 @@
 #include <memory>
 #include <variant>
 #include <map>
-#include "Luau/lua.h"
-#include "Luau/lualib.h"
-#include "Luau/luacode.h"
+#include <Luau/lua.h>
+#include <Luau/lualib.h>
+#include <Luau/luacode.h>
+#include "LuauGlobals.h"
 
 struct UserData {};
 
@@ -32,6 +33,7 @@ typedef std::variant<bool, int, char*> KeyType;
 class LuauState {
 public:
     friend class LuauReader;
+    friend class LuauGlobals;
 
     LuauState(const LuauState& other) = delete;
     LuauState(LuauState&& other);
@@ -39,10 +41,10 @@ public:
     LuauState& operator=(const LuauState& other) = delete;
     LuauState& operator=(LuauState&& other);
 
-    bool doesExist(const std::string &globalVarFunc) noexcept;
     std::list<std::any> runFunction(const std::string &func, std::list<std::any> params);
-    int getVariableType(const std::string &varName);
-    int getVarTypeInStack(StackIndex idx);
+
+    LuauGlobals& getGlobals() noexcept;
+
     std::any getVariable(const std::string &varName);
     std::any getVarInStack(StackIndex idx);
     
@@ -57,6 +59,7 @@ private:
 
     int call();
     std::unique_ptr<lua_State, void(*)(lua_State*)>  p_L;
+    LuauGlobals m_globals;
     void dumpstack() noexcept;   
 };
 
