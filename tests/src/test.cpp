@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include "LuauState.h"
 #include "LuauReader.h"
-#include "LuauExceptions.h"
+#include "LuauException.h"
 
 TEST_CASE("Check existing variables")
 {
@@ -30,8 +30,8 @@ TEST_CASE("Check script opening")
     try {
         LuauReader::getContextFromFile("./resources/non-existing.luau");
         FAIL("Must failed but succeed");
-    } catch (const Exception &e) {
-        if (e.getId() == LuauExceptions::FileDoesNotExist)
+    } catch (const LuauException &e) {
+        if (e.getId() == LuauErrorCode::FileDoesNotExist)
             SUCCEED("Failed successfully");
         else
             FAIL("Failed with the wrong exception");

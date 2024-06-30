@@ -1,7 +1,7 @@
 /*
- * File: /tomato/tomato/include/LuauExceptions.h
+ * File: /tomato/tomato/include/LuauException.h
  * 
- * Created the 25 June 2024, 12:50 am by TinyMinori
+ * Created the 14 June 2024, 02:41 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -13,7 +13,7 @@
 #include <exception>
 #include <string>
 
-enum LuauExceptions {
+enum LuauErrorCode {
     FileDoesNotExist,
     FileNotRegular,
     FileRightsError,
@@ -21,16 +21,18 @@ enum LuauExceptions {
     CompileSyntaxError,
     LoadError,
 
-    StateNotInitialized
+    StateNotInitialized,
+
+    IncorrectType,
 };
 
-class Exception: public std::exception {
+class LuauException: public std::exception {
 public:
-    Exception(LuauExceptions id, const std::string& message);
+    LuauException(LuauErrorCode id, const std::string& message);
     const char* what() const noexcept;
-    LuauExceptions getId() const noexcept;
+    LuauErrorCode getId() const noexcept;
 
 private:
     const std::string &m_message;
-    LuauExceptions m_id;
+    LuauErrorCode m_id;
 };
