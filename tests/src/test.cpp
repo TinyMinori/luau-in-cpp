@@ -11,7 +11,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers.hpp>
 #include <catch2/matchers/catch_matchers_exception.hpp>
-#include <stdexcept>
 #include "LuauState.h"
 #include "LuauReader.h"
 #include "LuauException.h"
@@ -31,7 +30,7 @@ TEST_CASE("Check script opening")
         LuauReader::getContextFromFile("./resources/non-existing.luau");
         FAIL("Must failed but succeed");
     } catch (const LuauException &e) {
-        if (e.getId() == LuauErrorCode::FileDoesNotExist)
+        if (e.getId() == FileDoesNotExist)
             SUCCEED("Failed successfully");
         else
             FAIL("Failed with the wrong exception");
