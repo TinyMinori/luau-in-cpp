@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tomato/include/LuauState.h
  * 
- * Created the 20 May 2024, 01:36 am by TinyMinori
+ * Created the 04 July 2024, 11:52 pm by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -30,10 +30,19 @@ typedef int64_t StackIndex;
 
 typedef std::variant<bool, int, char*> KeyType;
 
+struct ValueType;
+
+using LuauTable = std::map<KeyType, ValueType>;
+
+struct ValueType {
+    std::variant<int, double, bool, char *, LuauTable> v;
+};
+
 class LuauState {
 public:
     friend class LuauReader;
     friend class LuauGlobals;
+    friend class LuauDebug;
 
     LuauState(const LuauState& other) = delete;
     LuauState(LuauState&& other);
@@ -57,10 +66,9 @@ private:
     LuauState();
     LuauState(lua_State *threadState);
 
-    int call();
+    int call(uint parametersNumber = 0, bool hasMultiReturn = false);
     std::unique_ptr<lua_State, void(*)(lua_State*)>  p_L;
     LuauGlobals m_globals;
-    void dumpstack() noexcept;   
 };
 
 template<typename T>

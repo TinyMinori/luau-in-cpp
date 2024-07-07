@@ -1,7 +1,7 @@
 /*
  * File: /tomato/tomato/src/LuauState.cpp
  * 
- * Created the 20 May 2024, 01:36 am by TinyMinori
+ * Created the 05 July 2024, 12:09 am by TinyMinori
  * Description :
  * 
  * Project repository: https://github.com/TinyMinori/tomato
@@ -10,6 +10,7 @@
 
 #include "LuauState.h"
 #include "LuauGlobals.h"
+#include "LuauException.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -64,30 +65,29 @@ LuauState& LuauState::operator=(LuauState&& other) {
     return *this;
 }
 
-int     LuauState::call() {
-    int result = lua_pcall(p_L.get(), 0, 0, 0);
+int     LuauState::call(uint parametersNumber, bool hasMultiReturn) {
+    int result = lua_pcall(p_L.get(), parametersNumber, hasMultiReturn ? LUA_MULTRET : 0, 0);
 
     if (result == LUA_OK)
         return EXIT_SUCCESS;
 
-    std::string errorMsg; 
+    std::string errorMsg = "Unknown error message";
+    LuauErrorCode errorCode = CallError;
+
     if (lua_type(p_L.get(), -1) == LUA_TSTRING) {
         size_t  strSize = 0;
-        dumpstack();
         const char *msg = lua_tolstring(p_L.get(), -1, &strSize);
         errorMsg = std::string(msg, strSize);
     }
 
-    if (errorMsg.empty())
-        throw std::runtime_error("Unknown error message");
-
     if (result == LUA_ERRRUN)
-        throw std::runtime_error(errorMsg);
-    if (result == LUA_ERRMEM)
-        throw std::out_of_range(errorMsg);
-    if (result == LUA_ERRERR)
-        throw std::logic_error(errorMsg);
-    return result;
+        errorCode = RuntimeError;
+    else if (result == LUA_ERRMEM)
+        errorCode = MemoryError;
+    else if (result == LUA_ERRERR)
+        errorCode = ErrorHandlerError;
+
+    throw LuauException(errorCode, errorMsg);
 }
 
 std::list<std::any> LuauState::runFunction(const std::string &func, std::list<std::any> params) {
@@ -120,13 +120,7 @@ std::list<std::any> LuauState::runFunction(const std::string &func, std::list<st
         paramsNumber++;
     }
 
-    int callResult = lua_pcall(p_L.get(), paramsNumber, LUA_MULTRET, 0);
-
-    if (callResult != LUA_OK) {
-        dumpstack();
-
-        throw std::runtime_error(lua_tostring(p_L.get(), -1));
-    }
+    call(paramsNumber, true);
 
     std::list<std::any> resultList = {};
 
@@ -255,38 +249,4 @@ std::any    LuauState::getVarInStack(StackIndex idx) {
 
 void  LuauState::push() {
     lua_pushnil(p_L.get());
-}
-
-void    LuauState::dumpstack() noexcept {
-    std::clog << std::boolalpha;
-    std::clog << "*************************" << std::endl;
-    std::clog << "* Start of stack dump   *" << std::endl;
-    int top = lua_gettop(p_L.get());
-
-    if (top == 0)
-        std::clog << "* Empty stack           *" << std::endl;
-    
-    for (int i = top; i > 0; i--) {
-        std::clog << i << "\t" << std::setfill(' ') << std::setw(10) << luaL_typename(p_L.get(), i) << "\t";
-
-        switch (lua_type(p_L.get(), i)) {
-            case LUA_TNUMBER:
-                std::clog << get<double>(i) << std::endl;
-                break;
-            case LUA_TSTRING:
-                std::clog << get<char*>(i) << std::endl;
-                break;
-            case LUA_TBOOLEAN:
-                std::clog << get<bool>(i) << std::endl;
-                break;
-            case LUA_TNIL:
-                std::clog << "nil" << std::endl;
-                break;
-            default:
-                std::clog << get<void*>(i) << std::endl;
-                break;
-        }
-    }
-    std::clog << "* End of stack dump     *" << std::endl;
-    std::clog << "*************************" << std::endl;
 }

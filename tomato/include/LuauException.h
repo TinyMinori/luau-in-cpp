@@ -20,6 +20,11 @@ enum LuauErrorCode {
 
     CompileSyntaxError,
     LoadError,
+    CallError,
+
+    RuntimeError,
+    MemoryError,
+    ErrorHandlerError,
 
     StateNotInitialized,
 
