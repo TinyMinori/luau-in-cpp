@@ -9,6 +9,7 @@ set(LUAU_LIBRARY_DIR "/usr/lib/Luau")
 add_library(tomato SHARED)
 
 target_sources(tomato PRIVATE
+    ./src/LuauDebug.cpp
     ./src/LuauException.cpp
     ./src/LuauReader.cpp
     ./src/LuauGlobals.cpp
